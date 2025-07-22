@@ -11,8 +11,9 @@ app.use(express.json());
 
 // Routes
 app.get('/', (req, res) => {
-  res.send('🚀 Node API is live – deployed on Azure!');
+  res.send('🚀 Deployed via GitHub Actions — Hello Afrooz!');
 });
+
 
 app.post('/contact', (req, res) => {
   const { name, email, message } = req.body;
