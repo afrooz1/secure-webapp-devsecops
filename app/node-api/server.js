@@ -11,7 +11,7 @@ app.use(express.json());
 
 // Routes
 app.get('/', (req, res) => {
-  res.send('🚀 Deployed via GitHub Actions — Hello Afrooz!');
+  res.send('🚀 Deployed via GitHub Actions — Hello Afrooz! Nice to meet you!');
 });
 
 
