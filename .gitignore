@@ -1,0 +1,17 @@
+# Node
+node_modules/
+.env
+
+# Terraform
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+.terraform.lock.hcl
+
+# Deployment artifacts
+*.zip
+*.log
+
+# System
+.DS_Store
+Thumbs.db
