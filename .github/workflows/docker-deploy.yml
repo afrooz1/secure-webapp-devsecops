@@ -1,0 +1,50 @@
+name: CI/CD - Node API Container
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  ACR_NAME: ${{ secrets.ACR_NAME }}
+  ACR_LOGIN_SERVER: ${{ secrets.ACR_LOGIN_SERVER }}
+  AZURE_WEBAPP_NAME: ${{ secrets.AZURE_WEBAPP_NAME }}
+  AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: ⬇️ Checkout Code
+      uses: actions/checkout@v3
+
+    - name: 🔐 Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: 🐳 Docker Build
+      run: |
+        docker build -t $ACR_LOGIN_SERVER/nodeapi-afrooz:${{ github.sha }} ./app/node-api
+
+    - name: 🔍 (Optional) Trivy Scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ env.ACR_LOGIN_SERVER }}/nodeapi-afrooz:${{ github.sha }}
+
+    - name: 🔓 ACR Login
+      run: |
+        az acr login --name $ACR_NAME
+
+    - name: 📤 Push to ACR
+      run: |
+        docker tag $ACR_LOGIN_SERVER/nodeapi-afrooz:${{ github.sha }} $ACR_LOGIN_SERVER/nodeapi-afrooz:latest
+        docker push $ACR_LOGIN_SERVER/nodeapi-afrooz:${{ github.sha }}
+        docker push $ACR_LOGIN_SERVER/nodeapi-afrooz:latest
+
+    - name: 🚀 Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        images: ${{ env.ACR_LOGIN_SERVER }}/nodeapi-afrooz:latest
